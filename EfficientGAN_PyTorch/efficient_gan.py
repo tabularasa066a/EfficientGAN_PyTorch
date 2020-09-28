@@ -270,13 +270,16 @@ print(imges.size())  # torch.Size([64, 1, 64, 64])
 
 
 # モデルを学習させる関数を作成
-
+if torch.cuda.is_available(): # GPUが利用可能か確認
+  device = 'cuda'
+else:
+  device = 'cpu'
 
 def train_model(G, D, E, dataloader, num_epochs):
 
-    # GPUが使えるかを確認
-    device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
-    print("使用デバイス：", device)
+    # # GPUが使えるかを確認
+    # device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+    # print("使用デバイス：", device)
 
     # 最適化手法の設定
     lr_ge = 0.0001
