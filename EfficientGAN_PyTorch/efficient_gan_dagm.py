@@ -200,11 +200,9 @@ def make_datapath_list():
 
     train_img_list = list()  # 画像ファイルパスを格納
 
-    for img_idx in range(200):
-        img_path = "./data/img_78_28size/img_7_" + str(img_idx)+'.jpg'
-        train_img_list.append(img_path)
-
-        img_path = "./data/img_78_28size/img_8_" + str(img_idx)+'.jpg'
+    ## 正常系画像を格納
+    for img_idx in range(1, 201):
+        img_path = "../../DAGM2007/Normal/Class1/" + str(img_idx)+'.png'
         train_img_list.append(img_path)
 
     return train_img_list
@@ -239,6 +237,7 @@ class GAN_Img_Dataset(data.Dataset):
 
         img_path = self.file_list[index]
         img = Image.open(img_path)  # [高さ][幅]白黒
+        img= img.resize((28, 28))
 
         # 画像の前処理
         img_transformed = self.transform(img)
@@ -463,14 +462,11 @@ def make_test_datapath_list():
 
     train_img_list = list()  # 画像ファイルパスを格納
 
-    for img_idx in range(5):
-        img_path = "./data/test_28size/img_7_" + str(img_idx)+'.jpg'
+    for img_idx in range(1,6):
+        img_path = "../../DAGM2007/Normal/Class1/" + str(img_idx)+'.png'
         train_img_list.append(img_path)
 
-        img_path = "./data/test_28size/img_8_" + str(img_idx)+'.jpg'
-        train_img_list.append(img_path)
-
-        img_path = "./data/test_28size/img_2_" + str(img_idx)+'.jpg'
+        img_path = "../../DAGM2007/withDefects/Class1_def/" + str(img_idx)+'.png'
         train_img_list.append(img_path)
 
     return train_img_list
