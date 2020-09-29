@@ -14,6 +14,13 @@ import torch.optim as optim
 
 from torchvision import transforms
 
+## mnistのサイズは(28,28,1)
+IMG_SIZE = 128
+IMG_HALF = int(IMG_SIZE / 2)
+IMG_QURTERED = int(IMG_SIZE / 4)
+IMG_DOUBLE = int(IMG_SIZE * 2)
+print("設定サイズ:", IMG_SIZE, IMG_HALF, IMG_QURTERED, IMG_DOUBLE)
+
 
 # Setup seeds
 torch.manual_seed(1234)
