@@ -19,6 +19,7 @@ IMG_SIZE = 128
 IMG_HALF = int(IMG_SIZE / 2)
 IMG_QURTERED = int(IMG_SIZE / 4)
 IMG_DOUBLE = int(IMG_SIZE * 2)
+IMG_POW4 = int(IMG_SIZE * 4)
 print("設定サイズ:", IMG_SIZE, IMG_HALF, IMG_QURTERED, IMG_DOUBLE)
 
 
@@ -40,8 +41,8 @@ class Generator(nn.Module):
             nn.ReLU(inplace=True))
 
         self.layer2 = nn.Sequential(
-            nn.Linear(1024, 7*7*128),
-            nn.BatchNorm1d(7*7*128),
+            nn.Linear(1024, IMG_QURTERED*IMG_QURTERED*128),
+            nn.BatchNorm1d(IMG_QURTERED*IMG_QURTERED*128),
             nn.ReLU(inplace=True))
 
         self.layer3 = nn.Sequential(
@@ -61,7 +62,7 @@ class Generator(nn.Module):
         out = self.layer2(out)
 
         # 転置畳み込み層に入れるためにテンソルの形を整形
-        out = out.view(z.shape[0], 128, 7, 7)
+        out = out.view(z.shape[0], 128, IMG_QURTERED, IMG_QURTERED)
         out = self.layer3(out)
         out = self.last(out)
 
@@ -109,7 +110,7 @@ class Discriminator(nn.Module):
 
         # 最後の判定
         self.last1 = nn.Sequential(
-            nn.Linear(3648, 1024),
+            nn.Linear(66048, 1024),  ## TODO: ここの値はエラー分の行列の値からハードコーディングでいれるしかない。。。3468のところ
             nn.LeakyReLU(0.1, inplace=True))
 
         self.last2 = nn.Linear(1024, 1)
@@ -125,8 +126,11 @@ class Discriminator(nn.Module):
         z_out = self.z_layer1(z)
 
         # x_outとz_outを結合し、全結合層で判定
-        x_out = x_out.view(-1, 64 * 7 * 7)
+        # print("hogehoge~1", z_out.shape, x_out.shape)
+        x_out = x_out.view(-1, 64 * IMG_QURTERED * IMG_QURTERED)
+        # print("hogehoge~2", z_out.shape, x_out.shape)
         out = torch.cat([x_out, z_out], dim=1)
+        # print("hogehoge~3", out.shape)
         out = self.last1(out)
 
         feature = out  # 最後にチャネルを1つに集約する手前の情報
@@ -175,15 +179,20 @@ class Encoder(nn.Module):
             nn.LeakyReLU(0.1, inplace=True))
 
         # ここまでで画像のサイズは7×7になっている
-        self.last = nn.Linear(128 * 7 * 7, z_dim)
+        self.last = nn.Linear(128 * IMG_QURTERED * IMG_QURTERED, z_dim)
 
     def forward(self, x):
+        # print("hoge-ge3", x.shape)
         out = self.layer1(x)
+        # print("hoge-ge4", out.shape)
         out = self.layer2(out)
+        # print("hoge-ge5", out.shape)
         out = self.layer3(out)
 
         # FCに入れるためにテンソルの形を整形
-        out = out.view(-1, 128 * 7 * 7)
+        # print("hoge-ge1", out.shape)
+        out = out.view(-1, 128 * IMG_QURTERED * IMG_QURTERED)
+        # print("hoge-ge2", out.shape)
         out = self.last(out)
 
         return out
