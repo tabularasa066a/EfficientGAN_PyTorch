@@ -244,7 +244,7 @@ class GAN_Img_Dataset(data.Dataset):
 
         img_path = self.file_list[index]
         img = Image.open(img_path)  # [高さ][幅]白黒
-        img= img.resize((28, 28))
+        img= img.resize((IMG_SIZE, IMG_SIZE))
 
         # 画像の前処理
         img_transformed = self.transform(img)
