@@ -73,18 +73,18 @@ class Generator(nn.Module):
 import matplotlib.pyplot as plt
 # %matplotlib inline
 
-G = Generator(z_dim=20)
-G.train()
+# G = Generator(z_dim=100)
+# G.train()
 
 # 入力する乱数
 # バッチノーマライゼーションがあるのでミニバッチ数は2以上
-input_z = torch.randn(2, 20)
+# input_z = torch.randn(2, 20)
 
-# 偽画像を出力
-fake_images = G(input_z)  # torch.Size([2, 1, 28, 28])
-img_transformed = fake_images[0][0].detach().numpy()
-plt.imshow(img_transformed, 'gray')
-plt.show()
+# # 偽画像を出力
+# fake_images = G(input_z)  # torch.Size([2, 1, 28, 28])
+# img_transformed = fake_images[0][0].detach().numpy()
+# plt.imshow(img_transformed, 'gray')
+# plt.show()
 
 
 class Discriminator(nn.Module):
@@ -142,17 +142,17 @@ class Discriminator(nn.Module):
 
 
 # 動作確認
-D = Discriminator(z_dim=20)
+# D = Discriminator(z_dim=100)
 
-# 偽画像を生成
-input_z = torch.randn(2, 20)
-fake_images = G(input_z)
+# # 偽画像を生成
+# input_z = torch.randn(2, 20)
+# fake_images = G(input_z)
 
-# 偽画像をDに入力
-d_out, _ = D(fake_images, input_z)
+# # 偽画像をDに入力
+# d_out, _ = D(fake_images, input_z)
 
-# 出力d_outにSigmoidをかけて0から1に変換
-print(nn.Sigmoid()(d_out))
+# # 出力d_outにSigmoidをかけて0から1に変換
+# print(nn.Sigmoid()(d_out))
 
 
 class Encoder(nn.Module):
@@ -199,16 +199,16 @@ class Encoder(nn.Module):
 
 
 # 動作確認
-E = Encoder(z_dim=20)
+# E = Encoder(z_dim=100)
 
-# 入力する画像データ
-x = fake_images  # fake_imagesは上のGで作成したもの
+# # 入力する画像データ
+# x = fake_images  # fake_imagesは上のGで作成したもの
 
-# 画像からzをEncode
-z = E(x)
+# # 画像からzをEncode
+# z = E(x)
 
-print(z.shape)
-print(z)
+# print(z.shape)
+# print(z)
 
 
 def make_datapath_list():
@@ -217,7 +217,7 @@ def make_datapath_list():
     train_img_list = list()  # 画像ファイルパスを格納
 
     ## 正常系画像を格納
-    for img_idx in range(1, 201):
+    for img_idx in range(1, 801):
         img_path = "../../DAGM2007/Normal/Class1/" + str(img_idx)+'.png'
         train_img_list.append(img_path)
 
@@ -428,7 +428,7 @@ def train_model(G, D, E, dataloader, num_epochs):
         # epochのphaseごとのlossと正解率
         t_epoch_finish = time.time()
         print('-------------')
-        print('epoch {} || Epoch_D_Loss:{:.4f} ||Epoch_G_Loss:{:.4f} ||Epoch_E_Loss:{:.4f}'.format(
+        print('epoch {} || D_Loss:{:.4f} ||G_Loss:{:.4f} ||E_Loss:{:.4f}'.format(
             epoch, epoch_d_loss/batch_size, epoch_g_loss/batch_size, epoch_e_loss/batch_size))
         print('timer:  {:.4f} sec.'.format(t_epoch_finish - t_epoch_start))
         t_epoch_start = time.time()
@@ -453,6 +453,10 @@ def weights_init(m):
         # 全結合層Linearの初期化
         m.bias.data.fill_(0)
 
+z_dim = 20
+G = Generator(z_dim=z_dim)
+D = Discriminator(z_dim=z_dim)
+E = Encoder(z_dim=z_dim)
 
 # 初期化の実施
 G.apply(weights_init)
@@ -575,4 +579,14 @@ for i in range(0, 5):
 plt.savefig('figure.png')
 
 
-
+## TODO:Anormary Scoreに応じたヒストグラムの作成を行う
+fig2 = plt.figure()
+loss_each = np.round(loss_each, 0)
+plt.hist(loss_each)
+# グラフの指定
+plt.title("Histogram of Anormaly Score")
+# x方向のラベル
+plt.xlabel("Anormaly Score")
+# y方向のラベル
+plt.ylabel("Numbers")
+fig2.savefig("histgram.png")
